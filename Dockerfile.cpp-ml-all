@@ -23,6 +23,12 @@ RUN cd /temp/ && \
     -DTRITON_BACKEND_REPO_TAG=r22.06 .. && \
     make -j$(nproc) cc-clients
 
+RUN cd /temp/ && \
+    git clone https://github.com/Microsoft/onnxruntime.git && \
+    cd onnxruntime/ && git checkout tags/v1.12.0 && \
+    ./build.sh --config Release --build_shared_lib --parallel && \
+    cd build/Linux/Release && make install
+
 # Cleanup
 RUN apt-get autoremove -y && \
     apt-get clean -y && \
