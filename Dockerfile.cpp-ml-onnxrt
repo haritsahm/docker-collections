@@ -1,0 +1,27 @@
+FROM haritsahm/cpp-ml-base
+
+ENV DEBIAN_FRONTEND='noninteractive'
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+ENV CXX_VERSION 14
+
+WORKDIR /temp
+
+RUN apt-get -y update && \
+    apt-get -y upgrade && \
+    apt-get -y dist-upgrade && \
+    apt-get autoremove -y && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN cd /temp/ && \
+    git clone https://github.com/Microsoft/onnxruntime.git && \
+    cd onnxruntime/ && git checkout tags/v1.12.0 && \
+    ./build.sh --config Release --build_shared_lib --parallel && \
+    cd build/Linux/Release && make install
+
+# Cleanup
+RUN apt-get autoremove -y && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/*
+RUN rm -rf /temp/*
